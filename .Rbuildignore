@@ -1,0 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^README-.*\.png$
+^\.travis\.yml$
+^\.github$
+^data-raw$
+^docs$
+^pkgdown$
+^_pkgdown\.yml$
+^\.httr-oauth$
+^\.secrets$
+EOF < /dev/null
