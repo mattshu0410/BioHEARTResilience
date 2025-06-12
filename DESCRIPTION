@@ -1,0 +1,35 @@
+Package: BioHEARTResilience
+Type: Package
+Title: Identify Cardiovascular Disease Resilience Phenotypes Using CACS Data
+Version: 0.1.0
+Authors@R: 
+    person("Matthew", "Shu", , "matthew.shu@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Implements a novel methodology to classify resilient and susceptible 
+    phenotypes to coronary artery disease by comparing observed coronary artery 
+    calcium scores (CACS) against expected values derived from ensemble 
+    cardiovascular risk scoring. The package integrates multiple validated risk 
+    scores (FRS, ASCVD, MESA, SCORE2) and uses zero-inflated negative binomial 
+    regression to calculate risk-adjusted CACS percentiles.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    stats,
+    pscl (>= 1.5.5),
+    bestNormalize (>= 1.8.0),
+    CVrisk (>= 1.1.0),
+    RiskScorescvd (>= 0.2.0)
+Suggests:
+    ggplot2 (>= 3.4.0),
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    covr
+VignetteBuilder: knitr
+URL: https://github.com/yourusername/BioHEARTResilience
+BugReports: https://github.com/yourusername/BioHEARTResilience/issues
+Depends: 
+    R (>= 3.5)

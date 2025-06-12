@@ -1,0 +1,399 @@
+---
+title: "Introduction to BioHEART Resilience Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to BioHEART Resilience Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Overview
+
+The `BioHEARTResilience` package implements a novel methodology to identify cardiovascular disease resilience phenotypes by comparing observed coronary artery calcium scores (CACS) against expected values derived from ensemble cardiovascular risk scoring.
+
+This approach, developed from the BioHEART study, allows researchers to classify patients as:
+
+- **Resilient**: Lower CACS than expected given their risk profile
+- **Susceptible**: Higher CACS than expected given their risk profile  
+- **Reference**: CACS close to what's expected
+- **Other**: Intermediate classifications
+
+## Key Features
+
+- **Multiple Risk Scores**: Integrates FRS, ASCVD, MESA, and SCORE2 risk calculations
+- **Ensemble Methodology**: Combines risk scores using ordered quantile normalization
+- **Zero-Inflated Modeling**: Accounts for the high prevalence of zero CACS values
+- **Comprehensive Visualization**: Publication-ready plots and diagnostics
+- **Flexible Analysis**: Handles missing data and customizable thresholds
+
+## Installation
+
+```{r eval=FALSE}
+# Install from GitHub (when available)
+devtools::install_github("yourusername/BioHEARTResilience")
+
+# Load the package
+library(BioHEARTResilience)
+```
+
+```{r setup}
+library(BioHEARTResilience)
+```
+
+## Quick Start: Complete Analysis
+
+The easiest way to perform a resilience analysis is using the main `resilience_analysis()` function:
+
+```{r}
+# Load example data
+data("example_cohort")
+
+# Examine the data structure
+str(example_cohort)
+```
+
+Let's look at the first few rows:
+
+```{r}
+head(example_cohort)
+```
+
+And check the data summary:
+
+```{r}
+summary(example_cohort[c("age", "tc", "hdl", "sbp", "cacs")])
+```
+
+Now let's run the complete resilience analysis:
+
+```{r eval=FALSE}
+# Run complete analysis
+results <- resilience_analysis(
+  data = example_cohort,
+  cacs_col = "cacs",
+  cholesterol_unit = "mmol/L",
+  include_plots = TRUE
+)
+```
+
+```{r echo=FALSE}
+# For vignette, run without plots to avoid potential issues
+results <- resilience_analysis(
+  data = example_cohort,
+  cacs_col = "cacs", 
+  cholesterol_unit = "mmol/L",
+  include_plots = FALSE
+)
+```
+
+The function provides detailed progress reporting:
+
+```{r}
+# View the results summary
+print(results)
+```
+
+## Accessing Results
+
+The results object contains all analysis components:
+
+### Classification Results
+
+```{r}
+# View resilience classifications
+table(results$classifications$resilience_class)
+```
+
+```{r}
+# Look at classification details for first 10 subjects
+head(results$classifications[c("cacs_original", "cacs_percentile", "resilience_class")], 10)
+```
+
+### Risk Scores
+
+```{r}
+# Check risk score completion
+head(results$risk_summary$summary)
+```
+
+### Model Performance
+
+```{r}
+# Model diagnostics
+results$model_diagnostics$fit_statistics
+```
+
+## Step-by-Step Analysis
+
+For more control, you can run each step individually:
+
+### Step 1: Data Preparation
+
+```{r}
+# Prepare data with validation
+prepared_data <- prepare_cohort_data(
+  example_cohort,
+  cholesterol_unit = "mmol/L"
+)
+
+cat("Prepared data dimensions:", dim(prepared_data), "\n")
+```
+
+### Step 2: Calculate Risk Scores
+
+```{r}
+# Calculate individual risk scores
+risk_scores <- calculate_risk_scores(
+  prepared_data,
+  scores = c("frs", "ascvd", "mesa", "score2")
+)
+
+# Summarize risk scores
+risk_summary <- summarize_risk_scores(risk_scores)
+print(risk_summary)
+```
+
+### Step 3: Create Ensemble Score
+
+```{r}
+# Create ensemble risk score using ordered quantile normalization
+ensemble_scores <- ensemble_risk_score(risk_scores)
+
+# Check ensemble results
+cat("Ensemble scores created for", sum(!is.na(ensemble_scores$average_norm_score)), "subjects\n")
+head(ensemble_scores[c("average_norm_score", "n_scores_used")])
+```
+
+### Step 4: Fit CACS Model
+
+```{r}
+# Combine data for modeling
+modeling_data <- merge(prepared_data, ensemble_scores, by = "row.names")
+rownames(modeling_data) <- modeling_data$Row.names
+modeling_data$Row.names <- NULL
+
+# Fit zero-inflated negative binomial model
+cacs_model <- fit_cacs_model(
+  modeling_data,
+  cacs_col = "cacs",
+  risk_score_col = "average_norm_score"
+)
+
+# Check model summary
+summary(cacs_model)
+```
+
+### Step 5: Calculate Risk-Adjusted Percentiles
+
+```{r}
+# Calculate the "Calcium Vulnerability Score"
+percentiles <- calculate_cacs_percentiles(
+  cacs_model,
+  modeling_data
+)
+
+# Examine percentile distribution
+summary(percentiles$cacs_percentile)
+```
+
+### Step 6: Classify Resilience
+
+```{r}
+# Classify based on percentile thresholds
+classifications <- classify_resilience(percentiles)
+
+# View classification distribution
+table(classifications$resilience_class)
+```
+
+## Visualization
+
+The package provides several visualization functions:
+
+### CACS vs Risk Score Plot
+
+```{r eval=FALSE}
+# Combine final data
+final_data <- merge(modeling_data, classifications, by = "row.names")
+rownames(final_data) <- final_data$Row.names
+
+# Plot CACS vs risk score colored by classification
+plot_cacs_vs_risk(
+  final_data,
+  cacs_col = "cacs",
+  risk_score_col = "average_norm_score", 
+  class_col = "resilience_class"
+)
+```
+
+### Risk Score Distribution
+
+```{r eval=FALSE}
+# Plot risk score distributions by class
+plot_risk_distribution(
+  final_data,
+  risk_score_col = "average_norm_score",
+  class_col = "resilience_class"
+)
+```
+
+### Model Diagnostics
+
+```{r eval=FALSE}
+# Generate model diagnostic plots
+diagnostic_plots <- plot_model_diagnostics(cacs_model, percentiles)
+```
+
+## Customizing the Analysis
+
+### Custom Risk Scores
+
+```{r eval=FALSE}
+# Use only specific risk scores
+results_custom <- resilience_analysis(
+  example_cohort,
+  risk_scores = c("frs", "ascvd"),  # Only FRS and ASCVD
+  include_plots = FALSE
+)
+```
+
+### Custom Classification Thresholds
+
+```{r eval=FALSE}
+# Use custom percentile thresholds
+results_custom_thresh <- resilience_analysis(
+  example_cohort,
+  percentile_thresholds = c(
+    resilient = 15,        # More stringent resilient threshold
+    reference_low = 35,
+    reference_high = 65, 
+    susceptible = 85       # More stringent susceptible threshold
+  ),
+  include_plots = FALSE
+)
+```
+
+### Different Risk Regions (for SCORE2)
+
+```{r eval=FALSE}
+# For European populations at moderate risk
+results_moderate_risk <- resilience_analysis(
+  example_cohort,
+  risk_region = "Moderate",  # For SCORE2 calculation
+  include_plots = FALSE
+)
+```
+
+## Handling Missing Data
+
+The package gracefully handles missing data with informative warnings:
+
+```{r}
+# Check missing data patterns in original data
+missing_summary <- check_missing_values(example_cohort, verbose = FALSE)
+if (nrow(missing_summary) > 0) {
+  print(missing_summary)
+} else {
+  cat("No missing data found in example dataset\n")
+}
+```
+
+## Advanced Usage
+
+### Getting Risk Score Information
+
+```{r}
+# Get information about available risk scores
+risk_score_info()
+```
+
+### Validating Data for Risk Scores
+
+```{r}
+# Check which subjects are valid for each risk score
+valid_subjects <- validate_risk_data(
+  prepared_data, 
+  scores = c("frs", "ascvd", "mesa", "score2")
+)
+
+cat("Valid subjects for all scores:", sum(valid_subjects), "out of", length(valid_subjects), "\n")
+```
+
+### Individual Risk Score Calculation
+
+```{r eval=FALSE}
+# Calculate individual risk scores manually
+frs_scores <- CVrisk::ascvd_10y_frs(
+  gender = prepared_data$gender,
+  age = prepared_data$age,
+  hdl = prepared_data$hdl_mgdl,
+  totchol = prepared_data$tc_mgdl,
+  sbp = prepared_data$sbp,
+  bp_med = prepared_data$bp_med,
+  smoker = prepared_data$curr_smok,
+  diabetes = prepared_data$cvhx_dm
+)
+```
+
+## Interpreting Results
+
+### Resilience Classifications
+
+- **Resilient (< 20th percentile)**: Subjects with unexpectedly low CACS given their cardiovascular risk profile. These individuals may have protective factors worth investigating.
+
+- **Susceptible (> 80th percentile)**: Subjects with unexpectedly high CACS given their risk profile. These individuals may have additional risk factors or genetic susceptibility.
+
+- **Reference (40-60th percentile)**: Subjects whose CACS aligns with expectations based on traditional risk factors.
+
+- **Other**: Subjects in intermediate percentile ranges.
+
+### Clinical Implications
+
+Resilient and susceptible phenotypes represent extremes of the risk-to-disease relationship and may harbor novel protective or risk factors that could inform:
+
+- Biomarker discovery
+- Therapeutic target identification  
+- Precision medicine approaches
+- Understanding of disease mechanisms
+
+## Best Practices
+
+1. **Data Quality**: Ensure high-quality CACS measurements and clinical data
+2. **Missing Data**: Review missing data patterns and consider imputation if systematic
+3. **Model Validation**: Check model diagnostics, especially percentile uniformity
+4. **Threshold Selection**: Consider population-specific thresholds based on study goals
+5. **Replication**: Validate findings in independent cohorts when possible
+
+## Getting Help
+
+For questions about the package:
+
+```{r eval=FALSE}
+# View function help
+?resilience_analysis
+?calculate_risk_scores
+?ensemble_risk_score
+
+# View this vignette
+vignette("introduction", package = "BioHEARTResilience")
+```
+
+## References
+
+1. BioHEART Study: [Citation information will be added]
+2. CVrisk package: Castro V et al. CVrisk: Compute Risk Scores for Cardiovascular Diseases. R package.
+3. RiskScorescvd package: Risk score calculations for cardiovascular disease.
+4. Zero-inflated models: Zeileis A, Kleiber C, Jackman S. Regression Models for Count Data in R. Journal of Statistical Software.
+
+---
+
+*This vignette demonstrates the basic usage of the BioHEARTResilience package. For more advanced applications and detailed methodology, please refer to the original research publication.*
