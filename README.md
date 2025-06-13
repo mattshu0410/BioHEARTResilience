@@ -152,15 +152,6 @@ Your dataset should include:
 - `ethnicity`: Ethnicity for risk score calculation
 - `cacs`: Coronary artery calcium score
 
-## Testing
-
-The package includes a comprehensive testing suite with 129 tests achieving 100% pass rate:
-
-```r
-# Run all tests
-devtools::test()
-```
-
 ## License
 
 This project is licensed under the MIT License.
