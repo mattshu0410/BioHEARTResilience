@@ -8,7 +8,7 @@ plot_resilience_summary(
   data,
   cacs_col = "cacs",
   risk_score_col = "average_norm_score",
-  class_col = "resilience_class",
+  class_col = "classification",
   percentile_col = "cacs_percentile"
 )
 }

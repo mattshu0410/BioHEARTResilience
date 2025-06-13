@@ -6,21 +6,17 @@
 \usage{
 resilience_analysis(
   data,
-  cacs_col = "cacs",
   risk_scores = c("frs", "ascvd", "mesa", "score2"),
   risk_region = "Low",
   percentile_thresholds = c(resilient = 20, reference_low = 40, reference_high = 60,
     susceptible = 80),
   min_scores = 1,
   include_plots = TRUE,
-  cholesterol_unit = c("mmol/L", "mg/dL"),
-  validate_data = TRUE
+  ethnicity_mappings = NULL
 )
 }
 \arguments{
-\item{data}{Data frame with clinical and CACS data}
-
-\item{cacs_col}{Name of CACS column (default: "cacs")}
+\item{data}{Data frame with prepared clinical and CACS data (from prepare_cohort_data, missing CACS already removed)}
 
 \item{risk_scores}{Character vector of risk scores to calculate (default: all available)}
 
@@ -32,9 +28,7 @@ resilience_analysis(
 
 \item{include_plots}{Logical, whether to generate diagnostic plots (default: TRUE)}
 
-\item{cholesterol_unit}{Unit of cholesterol values (default: "mmol/L")}
-
-\item{validate_data}{Logical, whether to validate input data (default: TRUE)}
+\item{ethnicity_mappings}{Optional data frame with custom ethnicity mappings for risk scores}
 }
 \value{
 List containing all analysis results and optional plots
@@ -46,18 +40,40 @@ resilience classification.
 }
 \examples{
 \dontrun{
-# Complete analysis with default settings
-results <- resilience_analysis(my_data)
+# Step 1: Prepare cohort data
+prepared_data <- prepare_cohort_data(
+  raw_data,
+  cholesterol_unit = "mmol/L",
+  validate = TRUE
+)
+
+# Step 2: Run resilience analysis
+results <- resilience_analysis(prepared_data)
 
 # Access results
-results$classifications$resilience_class
+results$classifications$classification
 results$model_summary
 results$plots$cacs_vs_risk
 
-# Custom analysis
+# Custom analysis with ethnicity mappings
+custom_mappings <- data.frame(
+  original = c("1", "2", "3", "4", "5", "6", "7", "8", "9"),
+  ascvd = c("white", "other", "other", "aa", "other", "other", "other", "other", "other"),
+  mesa = c("white", "aa", "white", "aa", "chinese", "white", "white", "hispanic", "white"),
+  stringsAsFactors = FALSE
+)
+
+prepared_data <- prepare_cohort_data(
+  raw_data,
+  ethnicity_col = "ethcat",
+  id_col = "BioHEART_ID",
+  cholesterol_unit = "mmol/L"
+)
+
 results <- resilience_analysis(
-  my_data,
+  prepared_data,
   risk_scores = c("frs", "ascvd", "mesa"),
+  ethnicity_mappings = custom_mappings,
   percentile_thresholds = c(resilient = 15, reference_low = 35,
                           reference_high = 65, susceptible = 85),
   include_plots = FALSE

@@ -27,8 +27,8 @@ test_that("plot_cacs_vs_risk works correctly", {
   test_data <- data.frame(
     cacs = c(0, 5, 15, 45, 100, 250, 500),
     average_norm_score = rnorm(7),
-    resilience_class = c("resilient", "reference", "reference", 
-                        "reference", "susceptible", "susceptible", "susceptible")
+    classification = c("resilient", "reference", "reference", 
+                      "reference", "susceptible", "susceptible", "susceptible")
   )
   rownames(test_data) <- paste0("S", 1:7)
   
@@ -51,7 +51,7 @@ test_that("plot_risk_distribution works correctly", {
   # Create test ensemble results
   test_ensemble <- data.frame(
     average_norm_score = rnorm(20),
-    resilience_class = sample(c("resilient", "reference", "susceptible"), 20, replace = TRUE)
+    classification = sample(c("resilient", "reference", "susceptible"), 20, replace = TRUE)
   )
   rownames(test_ensemble) <- paste0("S", 1:20)
   
@@ -75,8 +75,8 @@ test_that("plot_resilience_summary works correctly", {
   test_results <- data.frame(
     cacs = c(0, 5, 15, 45, 100, 250),
     cacs_percentile = c(5, 25, 45, 65, 85, 95),
-    resilience_class = c("resilient", "reference", "reference", 
-                        "reference", "susceptible", "susceptible"),
+    classification = c("resilient", "reference", "reference", 
+                      "reference", "susceptible", "susceptible"),
     average_norm_score = rnorm(6)
   )
   rownames(test_results) <- paste0("S", 1:6)
@@ -90,7 +90,7 @@ test_that("visualization functions handle missing data", {
   test_data <- data.frame(
     cacs = c(0, NA, 15, 45),
     cacs_percentile = c(5, 25, NA, 65),
-    resilience_class = c("resilient", "reference", NA, "reference"),
+    classification = c("resilient", "reference", NA, "reference"),
     average_norm_score = c(0.5, NA, -0.3, 0.8)
   )
   rownames(test_data) <- paste0("S", 1:4)

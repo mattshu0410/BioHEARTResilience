@@ -28,7 +28,7 @@ scores, averages available scores with informative warnings.
 ensemble <- ensemble_risk_score(risk_scores)
 
 # Create ensemble from specific scores only
-ensemble <- ensemble_risk_score(risk_scores, 
+ensemble <- ensemble_risk_score(risk_scores,
                                score_cols = c("frs_10y", "ascvd_10y"))
 }
 }

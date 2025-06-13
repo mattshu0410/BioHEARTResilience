@@ -107,3 +107,41 @@ test_that("prepare_cohort_data validates ranges", {
   # Should produce warnings for out-of-range values
   expect_warning(result <- prepare_cohort_data(test_data, validate = TRUE))
 })
+
+test_that("prepare_cohort_data preserves ID column", {
+  # Test data with custom ID column
+  test_data <- data.frame(
+    BioHEART_ID = c("SUBJ_001", "SUBJ_002", "SUBJ_003"),
+    age = c(45, 55, 65),
+    gender = c("male", "female", "male"),
+    tc = c(5.0, 5.5, 4.8),
+    hdl = c(1.2, 1.4, 1.1),
+    sbp = c(120, 140, 130),
+    curr_smok = c(0, 1, 0),
+    cvhx_dm = c(0, 0, 1),
+    bp_med = c(0, 1, 1),
+    cacs = c(0, 15, 45)
+  )
+  
+  # Test with ID column specified
+  result <- prepare_cohort_data(test_data, id_col = "BioHEART_ID", cholesterol_unit = "mmol/L")
+  
+  # Check that ID column is preserved and renamed to "id"
+  expect_true("id" %in% names(result))
+  expect_equal(result$id, test_data$BioHEART_ID)
+  expect_equal(nrow(result), 3)
+  
+  # Test without ID column specified
+  test_data_no_id <- test_data[, !names(test_data) %in% "BioHEART_ID"]
+  result_no_id <- prepare_cohort_data(test_data_no_id, cholesterol_unit = "mmol/L")
+  expect_false("id" %in% names(result_no_id))
+  
+  # Test with missing CACS (should remove rows but preserve remaining IDs)
+  test_data_missing_cacs <- test_data
+  test_data_missing_cacs$cacs[2] <- NA
+  
+  result_missing <- prepare_cohort_data(test_data_missing_cacs, id_col = "BioHEART_ID", cholesterol_unit = "mmol/L")
+  expect_equal(nrow(result_missing), 2)  # One row removed
+  expect_true("id" %in% names(result_missing))
+  expect_equal(result_missing$id, c("SUBJ_001", "SUBJ_003"))  # Correct IDs preserved
+})

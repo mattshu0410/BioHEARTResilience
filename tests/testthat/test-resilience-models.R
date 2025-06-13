@@ -43,12 +43,12 @@ test_that("classify_resilience handles data correctly", {
   result <- classify_resilience(test_data)
   
   expect_equal(nrow(result), 6)
-  expect_true("resilience_class" %in% names(result))
+  expect_true("classification" %in% names(result))
   
   # Check specific classifications (function returns factors)
-  expect_equal(as.character(result$resilience_class[1]), "resilient")  # 5th percentile
-  expect_equal(as.character(result$resilience_class[3]), "reference")  # 45th percentile
-  expect_equal(as.character(result$resilience_class[5]), "susceptible")  # 85th percentile
+  expect_equal(as.character(result$classification[1]), "resilient")  # 5th percentile
+  expect_equal(as.character(result$classification[3]), "reference")  # 45th percentile
+  expect_equal(as.character(result$classification[5]), "susceptible")  # 85th percentile
 })
 
 test_that("classify_resilience works with data frame input", {
@@ -62,21 +62,21 @@ test_that("classify_resilience works with data frame input", {
   expected <- c("resilient", "resilient", "reference", "reference", 
                 "susceptible", "susceptible")
   
-  expect_equal(as.character(result$resilience_class), expected)
+  expect_equal(as.character(result$classification), expected)
   
   # Test with custom thresholds
   custom_thresholds <- c(resilient = 10, reference_low = 20, reference_high = 80, susceptible = 90)
   result_custom <- classify_resilience(test_data, thresholds = custom_thresholds)
   
-  expect_true("resilience_class" %in% names(result_custom))
-  expect_equal(as.character(result_custom$resilience_class[1]), "resilient")  # 5th percentile
-  expect_equal(as.character(result_custom$resilience_class[6]), "susceptible")  # 95th percentile
+  expect_true("classification" %in% names(result_custom))
+  expect_equal(as.character(result_custom$classification[1]), "resilient")  # 5th percentile
+  expect_equal(as.character(result_custom$classification[6]), "susceptible")  # 95th percentile
   
   # Test with NA values - use percentiles that fall clearly in expected categories
   test_data_na <- data.frame(cacs_percentile = c(0.05, NA, 0.45, 0.85))
   result_na <- classify_resilience(test_data_na)
-  expect_equal(as.character(result_na$resilience_class[2]), "missing")  # NA becomes "missing"
-  expect_equal(as.character(result_na$resilience_class[c(1, 3, 4)]), c("resilient", "reference", "susceptible"))
+  expect_equal(as.character(result_na$classification[2]), "missing")  # NA becomes "missing"
+  expect_equal(as.character(result_na$classification[c(1, 3, 4)]), c("resilient", "reference", "susceptible"))
 })
 
 test_that("classify_resilience validates input", {

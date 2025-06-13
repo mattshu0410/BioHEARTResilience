@@ -7,7 +7,7 @@
 plot_risk_distribution(
   data,
   risk_score_col = "average_norm_score",
-  class_col = "resilience_class",
+  class_col = "classification",
   plot_type = c("density", "histogram"),
   title = "Risk Score Distribution by Resilience Class",
   colors = NULL
@@ -18,7 +18,7 @@ plot_risk_distribution(
 
 \item{risk_score_col}{Name of risk score column (default: "average_norm_score")}
 
-\item{class_col}{Name of classification column (default: "resilience_class")}
+\item{class_col}{Name of classification column (default: "classification")}
 
 \item{plot_type}{Type of plot ("density" or "histogram")}
 

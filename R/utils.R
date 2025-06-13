@@ -93,10 +93,10 @@ check_missing_values <- function(data, cols = names(data), verbose = TRUE) {
 standardize <- function(x, na.rm = TRUE) {
   if (na.rm) {
     mean_x <- mean(x, na.rm = TRUE)
-    sd_x <- sd(x, na.rm = TRUE)
+    sd_x <- stats::sd(x, na.rm = TRUE)
   } else {
     mean_x <- mean(x)
-    sd_x <- sd(x)
+    sd_x <- stats::sd(x)
   }
   
   if (sd_x == 0) {
@@ -151,3 +151,14 @@ validate_gender <- function(x) {
   
   return(x)
 }
+
+# Global variable definitions to satisfy R CMD check
+# These are ggplot2 aesthetics and column names used in ggplot2::aes()
+# They should not produce warnings about undefined global variables
+utils::globalVariables(c(
+  "risk_score",      # Used in ggplot2::aes() calls
+  "cacs_plot",       # Used in ggplot2::aes() calls  
+  "fitted",          # Used in ggplot2::aes() calls
+  "observed",        # Used in ggplot2::aes() calls
+  "residuals"        # Used in ggplot2::aes() calls
+))

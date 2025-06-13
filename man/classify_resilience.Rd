@@ -31,7 +31,7 @@ their risk-adjusted CACS percentiles.
 classifications <- classify_resilience(percentile_data)
 
 # Use custom thresholds
-custom_thresholds <- c(resilient = 15, reference_low = 35, 
+custom_thresholds <- c(resilient = 15, reference_low = 35,
                       reference_high = 65, susceptible = 85)
 classifications <- classify_resilience(percentile_data, custom_thresholds)
 }

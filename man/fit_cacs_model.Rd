@@ -33,8 +33,8 @@ ensemble risk scores, following the BioHEART resilience methodology.
 \examples{
 \dontrun{
 # Fit CACS model using ensemble risk scores
-model <- fit_cacs_model(combined_data, 
-                       cacs_col = "cacs", 
+model <- fit_cacs_model(combined_data,
+                       cacs_col = "cacs",
                        risk_score_col = "average_norm_score")
 }
 }

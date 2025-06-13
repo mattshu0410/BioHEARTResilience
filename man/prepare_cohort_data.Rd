@@ -18,6 +18,7 @@ prepare_cohort_data(
   lipid_med_col = "lipid_med",
   fh_ihd_col = "fh_ihd",
   ethnicity_col = "ethnicity",
+  id_col = NULL,
   cholesterol_unit = c("mmol/L", "mg/dL"),
   validate = TRUE
 )
@@ -49,23 +50,32 @@ prepare_cohort_data(
 
 \item{ethnicity_col}{Name of ethnicity column (default: "ethnicity")}
 
+\item{id_col}{Optional name of ID column to preserve (e.g., "subject_id", "BioHEART_ID")}
+
 \item{cholesterol_unit}{Unit of cholesterol values ("mmol/L" or "mg/dL")}
 
 \item{validate}{Logical, whether to validate data ranges}
 }
 \value{
-Prepared data frame with standardized column names and units
+Prepared data frame with standardized column names and units (subjects with missing CACS removed)
 }
 \description{
 This function prepares and validates cohort data for use in resilience analysis.
 It ensures all required columns are present, validates data types and ranges,
-and converts units as needed.
+converts units as needed, and removes subjects with missing CACS values.
 }
 \examples{
 \dontrun{
 # Prepare data with cholesterol in mmol/L
 prepared_data <- prepare_cohort_data(
   raw_data,
+  cholesterol_unit = "mmol/L"
+)
+
+# Prepare data with custom ID column
+prepared_data <- prepare_cohort_data(
+  raw_data,
+  id_col = "BioHEART_ID",
   cholesterol_unit = "mmol/L"
 )
 }

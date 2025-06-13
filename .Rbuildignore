@@ -11,3 +11,5 @@
 ^\.httr-oauth$
 ^\.secrets$
 EOF < /dev/null
+^BioHEARTResilience\.Rproj$
+^LICENSE\.md$

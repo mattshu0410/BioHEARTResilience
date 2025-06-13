@@ -8,7 +8,7 @@ plot_cacs_vs_risk(
   data,
   cacs_col = "cacs",
   risk_score_col = "average_norm_score",
-  class_col = "resilience_class",
+  class_col = "classification",
   log_transform = TRUE,
   title = "CACS vs Average Normalized Risk Score",
   colors = NULL
@@ -21,7 +21,7 @@ plot_cacs_vs_risk(
 
 \item{risk_score_col}{Name of risk score column (default: "average_norm_score")}
 
-\item{class_col}{Name of classification column (default: "resilience_class")}
+\item{class_col}{Name of classification column (default: "classification")}
 
 \item{log_transform}{Logical, whether to log-transform CACS (default: TRUE)}
 
@@ -42,7 +42,7 @@ risk score, colored by resilience classification.
 plot_cacs_vs_risk(combined_data)
 
 # Custom colors and title
-plot_cacs_vs_risk(combined_data, 
+plot_cacs_vs_risk(combined_data,
                   title = "Resilience Classification",
                   colors = c(resilient = "green", susceptible = "red"))
 }
