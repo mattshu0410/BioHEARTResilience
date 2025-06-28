@@ -101,11 +101,15 @@ prepare_cohort_data <- function(data,
 
   # Convert cholesterol units if needed
   if (cholesterol_unit == "mmol/L") {
+    # Input is mmol/L, convert to mg/dL and keep original mmol/L
     result$tc_mgdl <- convert_cholesterol_units(result$tc)
     result$hdl_mgdl <- convert_cholesterol_units(result$hdl)
   } else {
+    # Input is mg/dL, store as mg/dL and convert to mmol/L for SCORE2
     result$tc_mgdl <- result$tc
     result$hdl_mgdl <- result$hdl
+    result$tc <- result$tc / 38.67  # Convert mg/dL to mmol/L
+    result$hdl <- result$hdl / 38.67  # Convert mg/dL to mmol/L
   }
 
   # Validate and standardize gender
