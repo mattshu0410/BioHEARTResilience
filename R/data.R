@@ -41,3 +41,30 @@
 #'
 #' @source Simulated data based on BioHEART cohort characteristics
 "example_cohort"
+
+#' Framingham Risk Score Coefficients
+#'
+#' Coefficient data for calculating Framingham Risk Score from the CVrisk package.
+#' These coefficients are used internally by CVrisk functions for risk calculation.
+#'
+#' @format A data structure containing coefficients for FRS calculation
+#' @source CVrisk package
+"frs_coef"
+
+#' ACC/AHA ASCVD Pooled Cohort Equations Coefficients
+#'
+#' Coefficient data for calculating ACC/AHA ASCVD risk from the CVrisk package.
+#' These coefficients are used internally by CVrisk functions for risk calculation.
+#'
+#' @format A data structure containing coefficients for ASCVD calculation
+#' @source CVrisk package
+"ascvd_pooled_coef"
+
+#' MESA CHD Risk Score Coefficients
+#'
+#' Coefficient data for calculating MESA CHD risk from the CVrisk package.
+#' These coefficients are used internally by CVrisk functions for risk calculation.
+#'
+#' @format A data structure containing coefficients for MESA calculation
+#' @source CVrisk package
+"mesa_coef"
