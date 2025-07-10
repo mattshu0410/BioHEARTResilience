@@ -1,7 +1,5 @@
 # BioHEART Resilience Package
 
-[\![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 An R package implementing the BioHEART methodology for cardiovascular disease resilience phenotype classification using coronary artery calcium scores (CACS) and ensemble risk scoring.
 
 ## Overview
